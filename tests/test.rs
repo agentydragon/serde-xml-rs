@@ -6,6 +6,11 @@ extern crate log;
 extern crate simple_logger;
 
 use serde_xml_rs::from_str;
+use simple_logger::SimpleLogger;
+
+fn init_logger() {
+    let _ = SimpleLogger::new().init();
+}
 
 #[derive(Debug, Deserialize, PartialEq)]
 struct Item {
@@ -15,7 +20,7 @@ struct Item {
 
 #[test]
 fn simple_struct_from_attributes() {
-    let _ = simple_logger::init();
+    init_logger();
 
     let s = r##"
         <item name="hello" source="world.rs" />
@@ -34,7 +39,7 @@ fn simple_struct_from_attributes() {
 
 #[test]
 fn multiple_roots_attributes() {
-    let _ = simple_logger::init();
+    init_logger();
 
     let s = r##"
         <item name="hello" source="world.rs" />
@@ -60,7 +65,7 @@ fn multiple_roots_attributes() {
 
 #[test]
 fn simple_struct_from_attribute_and_child() {
-    let _ = simple_logger::init();
+    init_logger();
 
     let s = r##"
         <item name="hello">
@@ -89,7 +94,7 @@ struct Project {
 
 #[test]
 fn nested_collection() {
-    let _ = simple_logger::init();
+    init_logger();
 
     let s = r##"
         <project name="my_project">
@@ -133,7 +138,7 @@ struct MyEnums {
 
 #[test]
 fn collection_of_enums() {
-    let _ = simple_logger::init();
+    init_logger();
 
     let s = r##"
         <enums>
