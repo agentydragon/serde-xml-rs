@@ -164,3 +164,76 @@ fn collection_of_enums() {
         }
     );
 }
+
+#[test]
+fn struct_with_flattened_untagged_enum() {
+    init_logger();
+
+    #[derive(Debug, Deserialize, PartialEq)]
+    #[serde(untagged)]
+    enum Enum {
+        A { field_a: i32 },
+        B { field_b: i32 },
+    }
+
+    #[derive(Debug, Deserialize, PartialEq)]
+    struct Struct {
+        common_int: i32,
+        #[serde(flatten)]
+        the_enum: Enum,
+    }
+
+    let s = r##"
+        <struct>
+          <common_int>123</common_int>
+          <field_a>456</field_a>
+        </struct>
+    "##;
+
+    let actual: Struct = from_str(s).unwrap();
+
+    assert_eq!(
+        actual,
+        Struct {
+            common_int: 123,
+            the_enum: Enum::A { field_a: 456 },
+        }
+    );
+}
+
+#[test]
+fn struct_with_flattened_internally_tagged_enum() {
+    init_logger();
+
+    #[derive(Debug, Deserialize, PartialEq)]
+    #[serde(tag = "which")]
+    enum Enum {
+        A { field_a: i32 },
+        B { field_b: i32 },
+    }
+
+    #[derive(Debug, Deserialize, PartialEq)]
+    struct Struct {
+        common_int: i32,
+        #[serde(flatten)]
+        the_enum: Enum,
+    }
+
+    let s = r##"
+        <struct>
+          <common_int>123</common_int>
+          <which>A</which>
+          <field_a>456</field_a>
+        </struct>
+    "##;
+
+    let actual: Struct = from_str(s).unwrap();
+
+    assert_eq!(
+        actual,
+        Struct {
+            common_int: 123,
+            the_enum: Enum::A { field_a: 456 },
+        }
+    );
+}
